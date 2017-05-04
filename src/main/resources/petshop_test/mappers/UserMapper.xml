@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="petshop_test.mappers.UserMapper">
+
+    <resultMap id="userResultMap" type="petshop_test.User">
+        <id property="id" column="id" javaType="_int" />
+        <!--
+                <constructor>
+                    <idArg column="id" name="id" />
+                    <arg column="parentId" javaType="_short" name="parentId" />
+                    <arg column="usersCount" javaType="_int" name="usersCount" />
+                </constructor>
+        -->
+    </resultMap>
+
+    <select id="findById" resultMap="userResultMap">
+        SELECT * FROM "users" WHERE "id" = #{id}
+    </select>
+    <select id="findAll" resultMap="userResultMap">
+        SELECT * FROM "users" ORDER BY "id" ASC
+    </select>
+    <select id="count" resultType="_int">
+        SELECT SUM("usersCount") FROM "userGroups"
+    </select>
+    <select id="countUserByLogin" resultType="_int">
+        SELECT COUNT("id") FROM "users" WHERE LOWER("login") = LOWER(#{login})
+    </select>
+    <select id="countUserByEmail" resultType="_int">
+        SELECT COUNT("id") FROM "users" WHERE LOWER("email") = LOWER(#{email})
+    </select>
+
+    <insert id="insertUser" parameterType="petshop_test.User" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO "users"
+            ("groupId", "login", email, "passwordHash")
+        VALUES
+            (#{groupId}, #{login}, #{email}, #{passwordHash});
+
+        <selectKey resultType="_int" keyProperty="id" >
+            SELECT CURRVAL('seq_users_id') AS id
+        </selectKey>
+    </insert>
+
+    <update id="updateUser" parameterType="petshop_test.User">
+        UPDATE "users" SET
+            "groupId" = #{groupId},
+            "login" = #{login},
+            "email" = #{email}
+        WHERE
+            "id" = #{id}
+    </update>
+
+    <delete id="removeUser" parameterType="petshop_test.User">
+        DELETE FROM "users" WHERE "id" = #{id}
+    </delete>
+</mapper>
